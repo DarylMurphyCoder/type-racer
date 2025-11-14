@@ -81,18 +81,26 @@
     }
 
     function stopTest() {
-        if (!startTime) return;
+        // Named function to stop the test and compute results
+        if (!startTime) return; // nothing to stop
+
+        // Calculate elapsed seconds with fractional precision
         const elapsed = (Date.now() - startTime) / 1000; // seconds
+
+        // Stop timer updates
         clearInterval(timerId);
         timerId = null;
 
-        const chars = typingInput.value.length;
-        const minutes = elapsed / 60 || 1/60; // avoid div by zero
+        // Compute simple WPM: characters / 5 per minute
+        const chars = typingInput.value.replace(/\s+$/,'').length; // trim trailing whitespace
+        const minutes = elapsed / 60 || 1/60; // avoid divide by zero
         const wpm = Math.round((chars / 5) / minutes);
 
+        // Update results: WPM and time. Show time rounded to 2 decimal places (in seconds)
         resultWpm.textContent = isFinite(wpm) ? wpm : 0;
-        resultTime.textContent = formatTime(elapsed);
+        resultTime.textContent = `${elapsed.toFixed(2)}s`;
 
+        // Reset start time and button states
         startTime = null;
         btnStart.removeAttribute('disabled');
         btnStop.setAttribute('disabled', '');
