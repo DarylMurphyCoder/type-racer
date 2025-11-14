@@ -1,0 +1,48 @@
+/* Basic visual polish for TypeRacer */
+:root{
+	--brand: #0d6efd;
+	--muted: #6c757d;
+}
+
+body{
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+	background: #f8f9fa;
+	color: #212529;
+}
+
+header h1{
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+
+#sample-text{
+	min-height: 96px;
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+#typing-input{
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+	font-size: 1rem;
+	resize: vertical;
+}
+
+.card{
+	border: 0;
+}
+
+.card .card-body{background: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);}
+
+/* Buttons spacing on small screens */
+@media (max-width: 575.98px){
+	.d-flex.gap-2{flex-direction: column;}
+}
+
+/* Slightly larger results numbers */
+#result-wpm{
+	font-weight: 700;
+	color: var(--brand);
+}
+
+/* Make the page breathe */
+.container{max-width: 980px}
