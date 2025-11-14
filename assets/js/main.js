@@ -11,6 +11,41 @@
     const btnInstructions = document.getElementById('btn-instructions');
     const sampleText = document.getElementById('sample-text');
 
+    // Predefined samples by difficulty
+    const SAMPLES = {
+        easy: [
+            'The quick brown fox jumps over the lazy dog.',
+            'Pack my box with five dozen liquor jugs.',
+            'Typing practice helps improve speed and accuracy.'
+        ],
+        medium: [
+            'Practice makes perfect: focus on accuracy before speed when you start.',
+            'A good typist develops rhythm and gradually increases words per minute through daily drills.',
+            'Keep your fingers on the home row and look at the screen, not your hands.'
+        ],
+        hard: [
+            'Sphinx of black quartz, judge my vow — a pangram that exercises punctuation and unusual letter combos.',
+            'When speed and accuracy converge, mastery follows; train deliberately with varied passages and timed drills.',
+            'Concentrate on consistent keystrokes, minimize corrections, and measure progress over weeks, not minutes.'
+        ]
+    };
+
+    let currentSample = '';
+
+    function chooseRandomSample(level) {
+        const arr = SAMPLES[level] || SAMPLES.easy;
+        const idx = Math.floor(Math.random() * arr.length);
+        return arr[idx];
+    }
+
+    function setSampleForCurrentDifficulty() {
+        const level = difficultySelect.value || 'easy';
+        const text = chooseRandomSample(level);
+        currentSample = text;
+        // display the text
+        sampleText.innerHTML = `<p class="mb-0">${text}</p>`;
+    }
+
     let startTime = null;
     let timerId = null;
 
@@ -33,7 +68,10 @@
         resultTime.textContent = '00:00';
         resultLevel.textContent = difficultySelect.options[difficultySelect.selectedIndex].text;
 
-        startTime = Date.now();
+    // ensure sample text matches selected difficulty (choose randomly on start)
+    setSampleForCurrentDifficulty();
+
+    startTime = Date.now();
         timerId = setInterval(updateTimer, 250);
         typingInput.focus();
 
@@ -80,6 +118,14 @@
         // initial button states
         btnStop.setAttribute('disabled', '');
         btnRetry.setAttribute('disabled', '');
+
+        // show an initial sample for the default difficulty
+        setSampleForCurrentDifficulty();
+
+        // when difficulty changes, pick a new random sample for the user
+        difficultySelect.addEventListener('change', () => {
+            setSampleForCurrentDifficulty();
+        });
 
         btnStart.addEventListener('click', startTest);
         btnStop.addEventListener('click', stopTest);
