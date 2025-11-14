@@ -10,6 +10,7 @@
     const resultWpm = document.getElementById('result-wpm');
     const btnInstructions = document.getElementById('btn-instructions');
     const sampleText = document.getElementById('sample-text');
+    const resultAccuracy = document.getElementById('result-accuracy');
 
     // Predefined samples by difficulty
     const SAMPLES = {
@@ -42,8 +43,12 @@
         const level = difficultySelect.value || 'easy';
         const text = chooseRandomSample(level);
         currentSample = text;
-        // display the text
-        sampleText.innerHTML = `<p class="mb-0">${text}</p>`;
+        // display the text safely as a paragraph
+        sampleText.innerHTML = '';
+        const p = document.createElement('p');
+        p.className = 'mb-0';
+        p.textContent = text;
+        sampleText.appendChild(p);
     }
 
     let startTime = null;
@@ -97,14 +102,64 @@
         const wpm = Math.round((chars / 5) / minutes);
 
         // Update results: WPM and time. Show time rounded to 2 decimal places (in seconds)
-        resultWpm.textContent = isFinite(wpm) ? wpm : 0;
+        resultWpm.textContent = isFinite(wpm) ? String(wpm) : '0';
         resultTime.textContent = `${elapsed.toFixed(2)}s`;
+
+        // Compute character-level accuracy and highlight sample
+        const sample = (currentSample || '').trim();
+        const typed = typingInput.value || '';
+
+        // Count correct characters up to typed length
+        let correctChars = 0;
+        for (let i = 0; i < typed.length; i++) {
+            if (sample[i] && typed[i] === sample[i]) correctChars++;
+        }
+        const totalTyped = typed.length || 0;
+        const accuracy = totalTyped > 0 ? (correctChars / totalTyped) * 100 : 0;
+        resultAccuracy.textContent = `${accuracy.toFixed(1)}%`;
+
+        // Render highlighted sample showing correct/incorrect characters
+        renderHighlightedSample(sample, typed);
 
         // Reset start time and button states
         startTime = null;
         btnStart.removeAttribute('disabled');
         btnStop.setAttribute('disabled', '');
         btnRetry.removeAttribute('disabled');
+    }
+
+    function renderHighlightedSample(sample, typed) {
+        // Replace sampleText content with spans per character for visual feedback
+        sampleText.innerHTML = '';
+        const p = document.createElement('p');
+        p.className = 'mb-0';
+
+        for (let i = 0; i < sample.length; i++) {
+            const ch = sample[i];
+            const span = document.createElement('span');
+            span.textContent = ch;
+            // If user typed a char at this position
+            if (i < typed.length) {
+                if (typed[i] === ch) {
+                    span.className = 'char-correct';
+                } else {
+                    span.className = 'char-wrong';
+                }
+            } else {
+                span.className = 'char-untouched';
+            }
+            p.appendChild(span);
+        }
+
+        // If user typed extra characters beyond sample, show them as errors
+        if (typed.length > sample.length) {
+            const extra = document.createElement('span');
+            extra.className = 'char-wrong';
+            extra.textContent = typed.slice(sample.length);
+            p.appendChild(extra);
+        }
+
+        sampleText.appendChild(p);
     }
 
     function retryTest() {
